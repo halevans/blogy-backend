@@ -93,6 +93,31 @@ router.delete('/api/articles/:id', (req, res) => {
  * URI:             /api/articles/:id       e.g. /api/articles/5d664b8b68b4f5092aba18e9
  * Descriptions:    Update an article by Article ID
  */
+router.patch('/api/articles/:id', (req, res) => {
+    Article.findById(req.params.id)
+    .then((article) => {
+        if (article) {
+            // Pass the result of Mongoose's `update` method to the next `.then`
+            return article.update(req.body.article)
+        } else {
+            // If we coudn't find a document with the matching ID
+            res.status(404).json({
+                error: {
+                    name: 'DocumentNotFoundError',
+                    message: 'The provided ID doesn\'t match any documents'
+                }
+            });
+        }
+    })
+    .then(() => {
+        // If the update succeeded, return 204 and no JSON
+        res.status(204).end();
+    })
+    // Catch any error that might occur
+    .catch((error) => {
+        res.status(500).json({ error: error });
+    });
+});
 
 
 /**
